@@ -1,15 +1,41 @@
+# FUS-ALS Molecular ALS Phenotype Scores
 This directory contains scripts used to process and analyze screens from the ALS
-patient-derived fibroblast study. Analyses for each screen are organized within
-individual directories corresponding to Figures 2-4 of the manuscript
-Figure_Scores=Fig. 2, Figure_ASO=Fig. 3, Figure_Transcriptomics=Fig. 4,
-Figure_Search=Extended data Figs. E1-E3. 
+patient-derived fibroblast study. We provide a Dockerfile to install all
+dependencies for running analyses reported in Kumbier et al. 2024. 
 
-Data required to run the scripts can be downloaded from Zenodo:
-https://zenodo.org/record/7247995. To run scripts, Initialize `.Renviron`
-variables:
+```
+  docker build -t als/als .
+  docker run -it --rm -v <path to project_als directory>:/ALS als/als
+```
 
-- `ALS_PAPER`=`<path_to_this_directory>`
+The core analysis scripts used for each screen / analysis include:
 
-- `ALS_DATA`=`<path_to_data_profiles_directory>` 
+## General scripts
+- `preprocessing`: directory containing scripts for processing raw image-derived
+features into the selected set of ALS-relevant eigenfeatures. Proecsses image
+features are available in the `data_profiles` directory of the zenodo
+repository. Raw image features and images are available upon request.
 
-The `data` directory on Zenodo must be placed in this directory.
+- `utilities.R`: script containg functions for fitting models along with helper
+functions for data processing and visualization.
+
+- `color_palette.R`: sets color palette used in figures.
+
+## Analysis specific scripts
+Scripts used to generate figures for the paper have been copied to
+`paper_figures` and are for the most part organized by figure.
+
+- `Figure_Search`: analyses of imaging marker set search—reported in
+  supplemental section. 
+
+- `Figure_Scores`: analyses for image-based scores (i-MAP scores).
+
+- `Figure_Transcriptomics`: analyses for transcriptomic-based scores (t-MAP
+scores).
+
+- `Figure_ASO`: analyses from ASO screen. *Note:* some of the sporadic figures
+are generated in `Figure_Transcriptomics`
+
+## Data
+Data for image-based cell profiles are contained in `data_profiles`, organized
+by screen. All other data can be found in `data`.

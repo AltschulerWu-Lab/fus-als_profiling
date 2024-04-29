@@ -1,4 +1,4 @@
-#' In this script, we run PCA analysis on expression data to investigate primary
+#' In this script, we run PCA analysis on expression data and report primary
 #' drivers of variation in fibroblast / spinal cord expression data.
 #' 
 #' Requires input datasets
@@ -17,26 +17,12 @@
 #+ setup, echo=FALSE, warning=FALSE, message=FALSE
 library(data.table)
 library(tidyverse)
-library(hrbrthemes)
 library(Matrix)
 library(gridExtra)
 library(ggsci)
 
 options(stringsAsFactors=FALSE)
-
-theme_set(
-  theme_ipsum(
-    plot_title_size=24,
-    axis_title_size=18,
-    strip_text_size=18, 
-    axis_text_size=18,
-    base_size=18,
-    axis=TRUE,
-    base_family='sans',
-    axis_col='#000000',
-    grid=FALSE
-  )
-)
+theme_set(theme_bw(base_size=18))
 
 grid.arrange4 <- function(...) grid.arrange(..., ncol=4)
 
@@ -45,16 +31,16 @@ grid.arrange4 <- function(...) grid.arrange(..., ncol=4)
 ################################################################################
 fig.base.dir <- Sys.getenv('ALS_PAPER')
 data.dir <- file.path(fig.base.dir, 'data/050322_RNAseq/')
-figure.dir <- file.path(fig.base.dir, 'paper_figures', 'Figure3')
-output.fig.dir <- file.path(figure.dir, 'fig3')
+figure.dir <- file.path(fig.base.dir, 'paper_figures', 'Figure_Transcriptomics')
+output.fig.dir <- file.path(figure.dir, 'fig')
 dir.create(output.fig.dir, showWarnings=FALSE)
 
 ################################################################################
 # Load data and initialize analysis parameters
 ################################################################################
 source(file.path(figure.dir, 'utilities.R'))
-source(file.path(figure.dir, 'load_fibroblast.R'))
-source(file.path(figure.dir, 'load_spine.R'))
+load(file.path(data.dir, 'fibro_processed.Rdata'))
+load(file.path(data.dir, 'spine_processed.Rdata'))
 
 # Initialize analysis parameters
 save.fig <- TRUE
@@ -64,9 +50,6 @@ gene_transform <- function(x) log(x + 1)
 # Format metadata feature names
 colnames(xmeta.fibro) <- str_replace_all(colnames(xmeta.fibro), ' ', '_')
 xmeta.fibro <- xmeta.fibro %>% mutate_if(is.character, as.factor)
-
-# Fix typo in cell line passage number
-xmeta.fibro$CellLinePassageNumber[xmeta.fibro$CellLine == 'ND40077'] <- 20
 
 # Clean names of fibro metadata
 xmeta.fibro <- xmeta.fibro %>%
@@ -86,7 +69,7 @@ pca <- prcomp(gene_transform(x.fibro))
 xpca <- cbind(pca$x, xmeta.fibro)
 pct.var <- round(pca$sdev ^ 2 / sum(pca$sdev ^ 2), 3) * 100
 
-meta.features <- c('Site', 'Sex', 'ALS', 'Age', 'Passage')
+meta.features <- c('Site', 'Sex', 'Genetics', 'Age')
 
 p <- lapply(meta.features, function(f) {
   out1 <- ggplot(xpca, aes_string(col=f)) +
@@ -105,6 +88,9 @@ p <- lapply(meta.features, function(f) {
     out1 <- out1 + scale_color_viridis_c()
     out2 <- out2 + scale_color_viridis_c()
     
+  } else if (f == "Genetics") {
+    out1 <- out1 + scale_color_manual(values = col.pal)
+    out2 <- out2 + scale_color_manual(values = col.pal)
   } else {
     out1 <- out1 + scale_color_jama()
     out2 <- out2 + scale_color_jama()
@@ -144,7 +130,7 @@ p <- lapply(meta.features, function(f) {
     out1 <- out1 + scale_color_viridis_c()
     out2 <- out2 + scale_color_viridis_c()
     
-  } else {
+  }  else {
     out1 <- out1 + scale_color_manual(values=disc.pal)
     out2 <- out2 + scale_color_manual(values=disc.pal)
   }

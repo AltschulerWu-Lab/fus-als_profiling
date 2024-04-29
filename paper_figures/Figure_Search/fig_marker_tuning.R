@@ -1,38 +1,13 @@
-#' # Figure S1
-#' The following script fits models by marker set for the FUS, CD63, EEA1 
-#' comparison screen (Fig. S1). We consider model performance with respect to
-#' both marker pairs and individual markers. 
-#' 
-#' Requires input datasets
-#'   `data_profiles/030321_FUSWT_Cell`
-#'   
-#' Requires models trained using scripts:
-#'    `train_fus_screen.R`
-#'   
-#'   Karl Kumbier 2/23/2022`
+################################################################################
 #+ setup, message=FALSE
+################################################################################
 library(tidyverse)
 library(data.table)
 library(tidytext)
 library(PRROC)
 library(scales)
 library(ggsci)
-library(hrbrthemes)
 library(gridExtra)
-
-theme_set(
-  theme_ipsum(
-    plot_title_size=24,
-    axis_title_size=24,
-    strip_text_size=24, 
-    axis_text_size=22,
-    base_size=24,
-    base_family='sans',
-    axis=TRUE,
-    axis_col='#000000',
-    grid=FALSE
-  )
-)
 
 # Set paths to data directories
 fig.base.dir <- Sys.getenv('ALS_PAPER')
@@ -41,6 +16,8 @@ figure.dir <- file.path(fig.base.dir, 'paper_figures', 'Figure_Search')
 
 source(file.path(fig.base.dir, 'paper_figures', 'utilities.R'))
 source(file.path(fig.base.dir, 'paper_figures', 'color_palette.R'))
+source(file.path(fig.base.dir, "paper_figures", "theme.R"))
+theme_set(theme_als())
 
 # Set paths to data directories
 data.dir <- file.path(data.base.dir, '030321_FUSWT', 'Cell_Filtered')
@@ -53,14 +30,10 @@ save.fig <- TRUE
 output.fig.dir <- file.path(figure.dir, 'fig/')
 load(file.path(output.fig.dir, 'model_030321_FUSWT.Rdata'))
 
-
+################################################################################
 #' ## Accuracy by marker set
-#' To evaluate performance of marker sets, we compute AUROC on held-out cell 
-#' lines at three data resolutions: (i) cell line (ii) well replicate 
-#' (iii) single cell. Since NS003 cannot be accurately classified using any
-#' marker set, but is an outlier wrt some, we drop this line when computing
-#' AUROC.
 #+ accuracy
+################################################################################
 accuracy <- lapply(fits, function(z) {
   
   # Drop cell line not classified by any marker set
@@ -115,13 +88,13 @@ xplot <- lapply(unique(predictions$Markers), function(m) {
   }
   
   p <- predictions.m  %>%
-    ggplot(aes(x=reorder(Figure, Ypred, median), y=Ypred, col=Genetics)) +
+    ggplot(aes(x=reorder(CellLine, Ypred, median), y=Ypred, col=Genetics)) +
     geom_boxplot(aes(fill=Genetics), outlier.shape=NA, coef=NULL, alpha=0.75) +
     geom_jitter(width=0.15, alpha=0.9) +
     theme(legend.position='none') +
     theme(axis.text.x=element_text(angle=90)) +
     xlab(NULL) +
-    ylab('FUS-ALS phenotype score') +
+    ylab('i-MAP score') +
     scale_color_manual(values=col.pal) +
     scale_fill_manual(values=col.pal) +
     ylim(0:1) +

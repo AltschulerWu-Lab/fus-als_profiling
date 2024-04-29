@@ -1,0 +1,41 @@
+# Keras install
+install.packages("keras")
+reticulate::install_python(version = "3.10")
+keras::install_keras()
+
+# Standard package installs
+install.packages("data.table")
+install.packages("tidyverse")
+install.packages("Matrix")
+install.packages("viridis")
+install.packages("ggsci")
+install.packages("caret")
+install.packages("glmnet")
+install.packages("PRROC")
+install.packages("RColorBrewer")
+install.packages("scales")
+install.packages("superheat")
+install.packages("gridExtra")
+install.packages("hrbrthemes")
+install.packages("ggpubr")
+install.packages("patchwork")
+install.packages("Cairo")
+install.packages("kableExtra")
+install.packages("clusterProfiler")
+install.packages("mltools")
+install.packages("ggrepel")
+install.packages("parallel")
+install.packages("ggh4x")
+install.packages("tidytext")
+install.packages("lme4")
+install.packages("lmerTest")
+install.packages("R.utils")
+
+# Bioconductor package installs
+install.packages("BiocManager")
+BiocManager::install("org.Hs.eg.db")
+BiocManager::install("DESeq2")
+
+# Devtools installs
+install.packages("devtools")
+devtools::install_github("karlkumbier/iRF2.0")
