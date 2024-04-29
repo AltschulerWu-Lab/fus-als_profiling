@@ -37,5 +37,7 @@ scores).
 are generated in `Figure_Transcriptomics`
 
 ## Data
-Data for image-based cell profiles are contained in `data_profiles`, organized
-by screen. All other data can be found in `data`.
+Data are available through the Zenodo repository:
+https://zenodo.org/records/10499037. Data for image-based cell profiles are
+contained in `data_profiles`, organized by screen. All other data can be found
+in `data`.
